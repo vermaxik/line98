@@ -1,0 +1,54 @@
+/* This file is for your main application css. */
+
+@import "./phoenix.css";
+@import "../../deps/phoenix_live_view/assets/css/live_view.css";
+
+.box {
+  display: block;
+  background: #444;
+  border-radius: 100%;
+  height: 50px;
+  width: 50px;
+  margin: 0;
+}
+
+.ball-red {
+  background: radial-gradient(circle at 50px 50px, #500, #a00);
+}
+
+.ball-green {
+  background: radial-gradient(circle at 50px 50px, #050, #0a0);
+}
+
+.ball-blue {
+  background: radial-gradient(circle at 50px 50px, #005, #00a);
+}
+
+.dot-red::after {
+  color: #900;
+  content: "x";
+  padding: 5px;
+  background-color: white;
+}
+
+.dot-green::after {
+  color: #090;
+  content: "x";
+  padding: 5px;
+  background-color: white;
+}
+
+.dot-blue::after {
+  color: #009;
+  content: "x";
+  padding: 5px;
+  background-color: white;
+}
+
+
+.wrapper {
+  width: 400px;
+  display: grid;
+  grid-template-columns: 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px ;
+  grid-gap: 5px;
+}
