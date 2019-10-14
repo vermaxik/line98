@@ -1,8 +1,8 @@
 <div class="wrapper">
-  <%= for item <- @board do %>
+  <%= for index <- 1..100 do %>
     <div
-      class="box <%= item.type %>-<%= item.color %>"
+      class="box <%= ball_class(@board, index) %> <%= selected_class(@board, @selected_cell, index)%>"
       phx-click="range"
-      phx-value-select="<%= item.cell %>"></div>
+      phx-value-select="<%= index %>"></div>
   <% end %>
 </div>

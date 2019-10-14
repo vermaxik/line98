@@ -9,7 +9,7 @@ defmodule Line98.Application do
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
-      Line98.Repo,
+      # Line98.Repo,
       # Start the endpoint when the application starts
       Line98Web.Endpoint,
       # Starts a worker by calling: Line98.Worker.start_link(arg)

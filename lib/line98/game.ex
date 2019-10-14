@@ -4,7 +4,7 @@ defmodule Line98.Game do
   @ballColors ["red", "green", "blue"]
 
   def init(_) do
-    {:ok, p_init_game()}
+    {:ok, init_game()}
   end
 
   def start_link([]) do
@@ -24,44 +24,45 @@ defmodule Line98.Game do
   end
 
   def handle_call({:move_ball, position}, _from, state) do
-    {:reply, grow_ball(state, position), state}
+    new_state = grow_ball(state, position)
+    {:reply, new_state, new_state}
   end
 
-  defp generate_board() do
-    Enum.to_list(1..100)
-      |>  Enum.reduce([], fn(value, acc) -> List.insert_at(acc, -1, %{cell: value, color: "empty", type: "ball"}) end)
+  defp init_game() do
+    build_cells("ball", 5)
+    |> build_cells("dot", 3)
+  end
+
+  defp build_cells(board \\ [], type, times) do
+    avoid_cells = board |> Enum.map(& &1.cell)
+
+    random_cells =
+      1..100
+      |> Enum.reject(fn n -> Enum.member?(avoid_cells, n) end)
+      |> Enum.shuffle()
+      |> Enum.take(times)
+
+    for n <- random_cells do
+      %{cell: n, color: random_color(), type: type}
+    end
+    |> Enum.concat(board)
   end
 
   defp random_color() do
-    @ballColors |> Enum.shuffle |> List.first
-  end
-
-  defp random_cell() do
-    Enum.to_list(1..100) |> Enum.shuffle |> List.first
-  end
-
-  defp p_init_game() do
-    board = generate_board()
-
-    update_board(board, "ball")
-      |> update_board("ball")
-      |> update_board("ball")
-      |> update_board("ball")
-      |> update_board("ball")
-      |> update_board("dot")
-      |> update_board("dot")
-      |> update_board("dot")
-  end
-
-  defp update_board(board, type) do
-    cell = random_cell()
-    List.update_at(board, cell, fn _ -> %{cell: cell, color: random_color(), type: type} end)
+    @ballColors |> Enum.shuffle() |> List.first()
   end
 
   defp grow_ball(board, position) do
-    board |> Enum.reduce([], fn(item, acc) ->
-      updated_item = if item.type == "dot", do: Map.update!(item, :type, fn _ -> "ball" end), else: item
-      List.insert_at(acc, -1, updated_item)
+    board
+    |> Enum.map(fn %{type: type} = item ->
+      cond do
+        type == "dot" ->
+          %{item | type: "ball"}
+
+        true ->
+          item
+      end
     end)
+    |> build_cells("dot", 3)
   end
 end
