@@ -4,7 +4,7 @@ defmodule Line98.Game do
   @ballColors ["red", "green", "blue"]
 
   def init(_) do
-    {:ok, p_init_game()}
+    {:ok, init_game()}
   end
 
   def start_link([]) do
@@ -28,61 +28,41 @@ defmodule Line98.Game do
     {:reply, new_state, new_state}
   end
 
-  defp generate_board() do
-    # Enum.to_list(1..100)
-    # |> Enum.reduce([], fn value, acc ->
-    #  List.insert_at(acc, -1, %{cell: value, color: "empty", type: "ball"})
-    # end)
+  defp init_game() do
+    build_cells("ball", 5)
+    |> build_cells("dot", 3)
+  end
 
-    # for n <- 1..100, do: %{cell: n, color: "empty", type: "ball"}
+  defp build_cells(board \\ [], type, times) do
+    avoid_cells = board |> Enum.map(& &1.cell)
 
-    1..100
-    |> Enum.reduce([], fn value, acc ->
-      [%{cell: value, color: "empty", type: "ball"} | acc]
-    end)
-    |> Enum.reverse()
+    random_cells =
+      1..100
+      |> Enum.reject(fn n -> Enum.member?(avoid_cells, n) end)
+      |> Enum.shuffle()
+      |> Enum.take(times)
+
+    for n <- random_cells do
+      %{cell: n, color: random_color(), type: type}
+    end
+    |> Enum.concat(board)
   end
 
   defp random_color() do
     @ballColors |> Enum.shuffle() |> List.first()
   end
 
-  defp random_cell() do
-    Enum.random(1..100)
-  end
-
-  defp p_init_game() do
-    generate_board()
-    |> update_board("ball", 5)
-    |> update_board("dot", 3)
-  end
-
-  def update_board(board, type, times) do
-    random_cells = 1..100 |> Enum.shuffle() |> Enum.take(times)
-
+  defp grow_ball(board, position) do
     board
-    |> Enum.map(fn %{cell: cell} = item ->
-      cond do # case https://elixir-lang.org/getting-started/case-cond-and-if.html
-        Enum.member?(random_cells, cell) ->
-          %{item | color: random_color(), type: type}
+    |> Enum.map(fn %{type: type} = item ->
+      cond do
+        type == "dot" ->
+          %{item | type: "ball"}
 
         true ->
           item
       end
     end)
-
-    #
-    # List.update_at(board, cell, fn _ -> %{cell: cell, color: random_color(), type: type} end)
-  end
-
-  defp grow_ball(board, position) do
-    board
-    |> Enum.reduce([], fn item, acc ->
-      updated_item =
-        if item.type == "dot", do: Map.update!(item, :type, fn _ -> "ball" end), else: item
-
-      List.insert_at(acc, -1, updated_item)
-    end)
-    |> update_board("dot", 3)
+    |> build_cells("dot", 3)
   end
 end

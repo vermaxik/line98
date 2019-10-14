@@ -45,6 +45,9 @@
   background-color: white;
 }
 
+.selected {
+  border: 2px solid black;
+}
 
 .wrapper {
   width: 400px;
