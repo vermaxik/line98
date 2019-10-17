@@ -45,8 +45,16 @@
   background-color: white;
 }
 
+@keyframes bounce {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-7px); }
+}
+
 .selected {
-  border: 2px solid black;
+  border: 1px solid black;
+  animation: bounce 0.2s;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
 }
 
 .wrapper {

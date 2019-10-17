@@ -11,10 +11,9 @@ defmodule Line98.Application do
       # Start the Ecto repository
       # Line98.Repo,
       # Start the endpoint when the application starts
-      Line98Web.Endpoint,
+      Line98Web.Endpoint
       # Starts a worker by calling: Line98.Worker.start_link(arg)
-      # {Line98.Worker, arg},
-      {Line98.Game, []}
+      # {Line98.Worker, arg}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

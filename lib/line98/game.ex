@@ -1,68 +1,88 @@
 defmodule Line98.Game do
-  use GenServer
+  alias __MODULE__
+
+  defstruct balls: %{}, selected_field: nil, score: 0
 
   @ballColors ["red", "green", "blue"]
 
-  def init(_) do
-    {:ok, init_game()}
+  def new do
+    %__MODULE__{}
+    |> init_fill()
   end
 
-  def start_link([]) do
-    GenServer.start_link(__MODULE__, [], name: __MODULE__)
+  defp init_fill(board) do
+    %Game{board | balls: build_balls("ball", 3) |> build_balls("dot", 3)}
   end
 
-  def board() do
-    GenServer.call(__MODULE__, :board)
-  end
-
-  def move_ball(position) do
-    GenServer.call(__MODULE__, {:move_ball, position})
-  end
-
-  def handle_call(:board, _from, state) do
-    {:reply, state, state}
-  end
-
-  def handle_call({:move_ball, position}, _from, state) do
-    new_state = grow_ball(state, position)
-    {:reply, new_state, new_state}
-  end
-
-  defp init_game() do
-    build_cells("ball", 5)
-    |> build_cells("dot", 3)
-  end
-
-  defp build_cells(board \\ [], type, times) do
-    avoid_cells = board |> Enum.map(& &1.cell)
-
+  defp build_balls(balls \\ %{}, type, times) do
     random_cells =
       1..100
-      |> Enum.reject(fn n -> Enum.member?(avoid_cells, n) end)
+      |> Enum.reject(fn n -> avoid_cells(balls, n) end)
       |> Enum.shuffle()
       |> Enum.take(times)
 
-    for n <- random_cells do
-      %{cell: n, color: random_color(), type: type}
+    new_balls = for n <- random_cells, into: %{}, do: {n, {random_color(), type}}
+    new_balls |> Map.merge(balls)
+
+    # balls = random_cells |> Enum.reduce(%{}, fn n, acc ->
+    #   Map.put(acc, n, {random_color(), type})
+    # end) |> Map.merge(board)
+  end
+
+  def select_field(board, field_index) do
+    case board.balls[field_index] do
+      {_, "ball"} ->
+        %Game{board | selected_field: field_index}
+
+      _ ->
+        board
     end
-    |> Enum.concat(board)
+  end
+
+  def move(%Game{selected_field: nil} = board, _), do: board
+
+  def move(%Game{selected_field: selected_field} = board, to) when to === selected_field,
+    do: board
+
+  def move(%Game{balls: balls, selected_field: selected_field} = board, to) do
+    cond do
+      avoid_cells(balls, to) ->
+        board
+
+      true ->
+        selected_ball = balls[selected_field]
+
+        new_balls =
+          Map.delete(balls, selected_field)
+          |> Map.put(to, selected_ball)
+          |> grow_balls()
+          |> build_balls("dot", 3)
+
+        %Game{board | selected_field: nil, balls: new_balls}
+    end
+  end
+
+  def grow_balls(balls) do
+    balls
+    |> Map.keys()
+    |> Enum.reduce(%{}, fn id, acc ->
+      {color, type} = balls[id]
+
+      cond do
+        type == "dot" ->
+          Map.put(acc, id, {color, "ball"})
+
+        true ->
+          Map.put(acc, id, {color, type})
+      end
+    end)
   end
 
   defp random_color() do
     @ballColors |> Enum.shuffle() |> List.first()
   end
 
-  defp grow_ball(board, position) do
-    board
-    |> Enum.map(fn %{type: type} = item ->
-      cond do
-        type == "dot" ->
-          %{item | type: "ball"}
-
-        true ->
-          item
-      end
-    end)
-    |> build_cells("dot", 3)
+  defp avoid_cells(balls, field_index) do
+    balls |> Map.keys() |> Enum.member?(field_index)
   end
 end

@@ -1,21 +1,20 @@
 defmodule Line98Web.PlayView do
   use Line98Web, :view
 
-  def ball_class(board, index) do
-    board
-    |> Enum.map(fn %{cell: cell} = item ->
-      cond do
-        cell == index ->
-          "#{item.type}-#{item.color}"
-
-        true ->
-          ""
-      end
-    end)
+  def cell_class(board, index) do
+    ball_class(board, index) <> selected_class(board, index)
   end
 
-  def selected_class(board, cell \\ 0, index) do
-    cells = board |> Enum.reject(&(&1.type == "dot")) |> Enum.map(& &1.cell)
-    if Enum.member?(cells, index) && cell == index, do: "selected"
+  def ball_class(board, index) do
+    %{balls: balls} = board
+
+    if Map.has_key?(balls, index),
+      do: balls[index] |> Tuple.to_list() |> Enum.reverse() |> Enum.join("-"),
+      else: ""
+  end
+
+  def selected_class(board, index) do
+    %{selected_field: selected, balls: balls} = board
+    if Map.has_key?(balls, index) && selected == index, do: " selected", else: ""
   end
 end
