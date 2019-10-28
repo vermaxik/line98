@@ -1,4 +1,5 @@
-defmodule Maze.Solver do
+defmodule Line98.Board.Solver do
+  alias Line98.Board
   @doc """
   Solves the given %Maze{} using a breadth-first algorithm
   Returns the shortest route as a list of directions
@@ -18,7 +19,7 @@ defmodule Maze.Solver do
     {{:value, {{x, y} = pos, route}}, queue} = :queue.out(queue)
 
     cond do
-      Maze.wall?(maze, pos) ->
+      Board.wall?(maze, pos) ->
         # We hit a wall
         shortest_route(maze, queue, visited)
 
