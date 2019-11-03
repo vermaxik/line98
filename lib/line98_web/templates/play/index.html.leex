@@ -1,9 +1,13 @@
 <h3>Score: <%= @board.score %></h3>
+
 <div class="wrapper">
-  <%= for index <- 1..100 do %>
-    <div
-      class="box <%= cell_class(@board, index) %>"
-      phx-click="range"
-      phx-value-select="<%= index %>"></div>
+  <%= for y <- 1..10 do %>
+    <%= for x <- 1..10 do %>
+      <div
+        class="box <%= cell_class(@board, {x, y}) %>"
+        phx-click="range"
+        phx-value-select-x="<%= x %>"
+        phx-value-select-y="<%= y %>"></div>
+    <% end %>
   <% end %>
 </div>

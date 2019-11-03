@@ -1,20 +1,20 @@
 defmodule Line98Web.PlayView do
   use Line98Web, :view
 
-  def cell_class(board, index) do
-    ball_class(board, index) <> selected_class(board, index)
+  def cell_class(board, coordinate) do
+    ball_class(board, coordinate) <> selected_class(board, coordinate)
   end
 
-  def ball_class(board, index) do
+  def ball_class(board, coordinate) do
     %{balls: balls} = board
 
-    if Map.has_key?(balls, index),
-      do: balls[index] |> Tuple.to_list() |> Enum.reverse() |> Enum.join("-"),
+    if Map.has_key?(balls, coordinate),
+      do: balls[coordinate] |> Tuple.to_list() |> Enum.reverse() |> Enum.join("-"),
       else: ""
   end
 
-  def selected_class(board, index) do
+  def selected_class(board, coordinate) do
     %{selected_field: selected, balls: balls} = board
-    if Map.has_key?(balls, index) && selected == index, do: " selected", else: ""
+    if Map.has_key?(balls, coordinate) && selected == coordinate, do: " selected", else: ""
   end
 end

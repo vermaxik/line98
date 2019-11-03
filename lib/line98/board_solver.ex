@@ -1,5 +1,6 @@
 defmodule Line98.Board.Solver do
   alias Line98.Board
+
   @doc """
   Solves the given %Maze{} using a breadth-first algorithm
   Returns the shortest route as a list of directions
