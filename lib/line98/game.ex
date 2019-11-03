@@ -17,7 +17,8 @@ defmodule Line98.Game do
   end
 
   def select_field(board, coordinate) do
-    IO.inspect coordinate
+    IO.inspect(coordinate)
+
     case board.balls[coordinate] do
       {_, "ball"} ->
         %Game{board | selected_field: coordinate}
@@ -33,12 +34,13 @@ defmodule Line98.Game do
     do: board
 
   def move(%Game{balls: balls, selected_field: selected_field} = board, to) do
-    solution = %Board{
-                start_point: selected_field,
-                exit_point: to,
-                walls: Ball.walls(balls, selected_field)
-              }
-              |> Solver.shortest_route()
+    solution =
+      %Board{
+        start_point: selected_field,
+        exit_point: to,
+        walls: Ball.walls(balls, selected_field)
+      }
+      |> Solver.shortest_route()
 
     cond do
       Ball.avoid_cells(balls, to) ->
@@ -49,6 +51,7 @@ defmodule Line98.Game do
 
       true ->
         new_balls = grow_and_generate_balls(board, to)
+
         %Game{board | selected_field: nil, balls: new_balls}
         |> IO.inspect(label: "Game#board")
         |> get_score(to)
@@ -64,24 +67,38 @@ defmodule Line98.Game do
     |> Ball.build("dot", 3)
   end
 
-  def get_score(%Game{balls: balls, selected_field: selected_field, score: score} = board, {x, y} = to) do
-    str_balls = balls
-                |> Ball.get_by_line(y)
-                |> Enum.map(fn {{_,_}, {color,_}} -> color end)
-                |> Enum.join("")
+  def get_score(
+        %Game{balls: balls, selected_field: selected_field, score: score} = board,
+        {x, y} = to
+      ) do
+    str_balls =
+      balls
+      |> Ball.get_by_horizontal(y)
+      |> IO.inspect(label: "get_by_horizontal")
+      |> Enum.map(fn {{_, _}, {color, _}} -> color end)
+      |> Enum.join("")
 
-    str_regex = String.duplicate("blue", 5) <>
-                "|" <>
-                String.duplicate("red", 5) <>
-                "|" <>
-                String.duplicate("green", 5)
+    check_balls =
+      balls
+      |> Ball.get_by_vertical(x)
+      |> IO.inspect(label: "get_by_vertical")
+      |> Enum.group_by(fn {_, {color, _}} -> color end)
 
-    regex = ~r/#{str_regex}/
-
-    case Regex.match?(regex, str_balls) do
-      true -> %Game{board | score: score + 10}
-      false -> board
-    end
+    update_score(board, check_balls, "red")
+    |> update_score(check_balls, "blue")
+    |> update_score(check_balls, "green")
   end
 
+  def update_score(%Game{balls: balls, score: score} = board, check_balls, color) do
+    cond do
+      check_balls[color] == nil ->
+        board
+
+      length(check_balls[color]) >= 5 ->
+        %Game{board | balls: balls, score: score + 10}
+
+      true ->
+        board
+    end
+  end
 end

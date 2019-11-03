@@ -1,5 +1,7 @@
 defmodule Line98.Ball do
-  @ballColors ["red", "green", "blue"]
+  @colors ["red", "green", "blue"]
+
+  def colors, do: @colors
 
   def build(balls \\ %{}, type, times) do
     new_balls = for n <- random_cells(balls, times), into: %{}, do: {n, {random_color(), type}}
@@ -9,8 +11,9 @@ defmodule Line98.Ball do
   defp random_cells(balls, times) do
     1..times
     |> Enum.reduce([], fn _, acc ->
-        List.insert_at(acc, 0, {:rand.uniform(10), :rand.uniform(10)})
-      end)
+      # add avoid cells
+      List.insert_at(acc, 0, {:rand.uniform(10), :rand.uniform(10)})
+    end)
   end
 
   def grow(balls) do
@@ -26,23 +29,18 @@ defmodule Line98.Ball do
     end)
   end
 
-  def get_by_line(balls, line) do
+  def get_by_horizontal(balls, line) do
     balls
-    |> Map.to_list
+    |> Map.to_list()
     |> Enum.filter(fn {_, {_, type}} -> type == "ball" end)
     |> Enum.filter(fn {{_, y}, _} -> y == line end)
+  end
 
-
-    # |> Map.to_list()
-    # |> Enum.flat_map(fn {index, {color, type}} ->
-    #     case type == "ball" do
-    #       true -> [{index, color}]
-    #       false -> []
-    #     end
-    #   end)
-    # |> Enum.filter(fn {{_, x}, _} -> x == line end)
-    # |> Enum.map(fn {{_, _}, color} -> color end)
-    # |> Enum.join("")
+  def get_by_vertical(balls, line) do
+    balls
+    |> Map.to_list()
+    |> Enum.filter(fn {_, {_, type}} -> type == "ball" end)
+    |> Enum.filter(fn {{x, _}, _} -> x == line end)
   end
 
   def walls(balls, selected_field) do
@@ -58,7 +56,7 @@ defmodule Line98.Ball do
   end
 
   defp random_color() do
-    @ballColors
+    colors()
     |> Enum.shuffle()
     |> List.first()
   end

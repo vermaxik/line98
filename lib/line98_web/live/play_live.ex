@@ -13,7 +13,7 @@ defmodule Line98Web.PlayLive do
   end
 
   def handle_event("range", %{"select-x" => x, "select-y" => y}, %{assigns: assigns} = socket) do
-    select_value = {x |> String.to_integer , y |> String.to_integer }
+    select_value = {x |> String.to_integer(), y |> String.to_integer()}
     selected_field = assigns.board.selected_field
 
     balls =
