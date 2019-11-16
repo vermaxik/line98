@@ -67,26 +67,25 @@ defmodule Line98.Game do
     |> Ball.build("dot", 3)
   end
 
-  def get_score(
-        %Game{balls: balls, selected_field: selected_field, score: score} = board,
-        {x, y} = to
-      ) do
-    str_balls =
-      balls
-      |> Ball.get_by_horizontal(y)
-      |> IO.inspect(label: "get_by_horizontal")
-      |> Enum.map(fn {{_, _}, {color, _}} -> color end)
-      |> Enum.join("")
-
+  def get_score(%Game{balls: balls, score: score} = board, {x, y} = to) do
     check_balls =
       balls
       |> Ball.get_by_vertical(x)
       |> IO.inspect(label: "get_by_vertical")
-      |> Enum.group_by(fn {_, {color, _}} -> color end)
 
-    update_score(board, check_balls, "red")
-    |> update_score(check_balls, "blue")
-    |> update_score(check_balls, "green")
+    ids = for {{^x, y}, {_, "ball"}} <- check_balls, do: y
+
+    ids |> IO.inspect(label: "ids")
+
+    ids
+    |> Enum.reverse()
+    |> Enum.reduce([], fn
+      id, [head = [h | _] | tail] when id == h - 1 -> [[id | head] | tail]
+      id, acc -> [[id] | acc]
+    end)
+    |> IO.inspect(charlists: :as_integers, label: "sequence")
+
+    board
   end
 
   def update_score(%Game{balls: balls, score: score} = board, check_balls, color) do

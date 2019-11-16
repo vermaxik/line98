@@ -30,23 +30,19 @@ defmodule Line98.Ball do
   end
 
   def get_by_horizontal(balls, line) do
-    balls
-    |> Map.to_list()
-    |> Enum.filter(fn {_, {_, type}} -> type == "ball" end)
-    |> Enum.filter(fn {{_, y}, _} -> y == line end)
+    for {{_, ^line}, {_, "ball"}} = ball <- balls, do: ball
   end
 
   def get_by_vertical(balls, line) do
-    balls
-    |> Map.to_list()
-    |> Enum.filter(fn {_, {_, type}} -> type == "ball" end)
-    |> Enum.filter(fn {{x, _}, _} -> x == line end)
+    for {{^line, _}, {_, "ball"}} = ball <- balls, do: ball
   end
 
   def walls(balls, selected_field) do
-    for n <- Map.keys(balls) |> Enum.filter(&(&1 != selected_field)),
-        into: MapSet.new(),
-        do: n
+    coordinates =
+      Map.keys(balls)
+      |> Enum.filter(&(&1 != selected_field))
+
+    for n <- coordinates, into: MapSet.new(), do: n
   end
 
   def avoid_cells(balls, coordinate) do

@@ -17,12 +17,9 @@ defmodule Line98Web.PlayLive do
     selected_field = assigns.board.selected_field
 
     balls =
-      cond do
-        selected_field == nil ->
-          assigns.board |> Line98.Game.select_field(select_value)
-
-        true ->
-          assigns.board |> Line98.Game.move(select_value)
+      case selected_field do
+        nil -> assigns.board |> Line98.Game.select_field(select_value)
+        _ -> assigns.board |> Line98.Game.move(select_value)
       end
 
     IO.inspect(balls, label: "handle_event#balls")
