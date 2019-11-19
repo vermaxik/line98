@@ -10,6 +10,8 @@
   height: 50px;
   width: 50px;
   margin: 0;
+  text-align: center;
+  padding-top: 13px;
 }
 
 .ball-red {
@@ -26,23 +28,32 @@
 
 .dot-red::after {
   color: #900;
-  content: "x";
-  padding: 5px;
-  background-color: white;
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle at 10px 10px, #500, #a00);
+  display: inline-block;
+  border-radius: 50%;
 }
 
 .dot-green::after {
   color: #090;
-  content: "x";
-  padding: 5px;
-  background-color: white;
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle at 10px 10px, #050, #0a0);
+  display: inline-block;
+  border-radius: 50%;
 }
 
 .dot-blue::after {
   color: #009;
-  content: "x";
-  padding: 5px;
-  background-color: white;
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle at 10px 10px, #005, #00a);
+  display: inline-block;
+  border-radius: 50%;
 }
 
 @keyframes bounce {

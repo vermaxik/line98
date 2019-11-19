@@ -5,7 +5,7 @@
     <%= for x <- 1..10 do %>
       <div
         class="box <%= cell_class(@board, {x, y}) %>"
-        phx-click="range"
+        phx-click="cell"
         phx-value-select-x="<%= x %>"
         phx-value-select-y="<%= y %>"></div>
     <% end %>

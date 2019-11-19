@@ -37,6 +37,33 @@ defmodule Line98.Ball do
     for {{^line, _}, {_, "ball"}} = ball <- balls, do: ball
   end
 
+  def group_by_color_vertical(balls, line) do
+    balls
+    |> get_by_vertical(line)
+    |> group_by_color()
+    |> IO.inspect(label: "group_by_color_vertical")
+  end
+
+  def group_by_color_horizontal(balls, line) do
+    balls
+    |> get_by_horizontal(line)
+    |> group_by_color()
+    |> IO.inspect(label: "group_by_color_horizontal")
+  end
+
+  def vertical_ids(balls, line) do
+    for {{^line, y}, {_, "ball"}} <- balls, do: y
+  end
+
+  def horizontal_ids(balls, line) do
+    for {{x, ^line}, {_, "ball"}} <- balls, do: x
+  end
+
+  def group_by_color(balls) do
+    balls
+    |> Enum.group_by(fn {{x, y}, {color, type}} -> color end)
+  end
+
   def walls(balls, selected_field) do
     coordinates =
       Map.keys(balls)

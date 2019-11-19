@@ -16,7 +16,7 @@ defmodule Line98.Game do
     %Game{board | balls: balls}
   end
 
-  def select_field(board, coordinate) do
+  def select(board, coordinate) do
     IO.inspect(coordinate)
 
     case board.balls[coordinate] do
@@ -54,7 +54,12 @@ defmodule Line98.Game do
 
         %Game{board | selected_field: nil, balls: new_balls}
         |> IO.inspect(label: "Game#board")
-        |> get_score(to)
+        |> get_score_vertical(to, "red")
+        |> get_score_horizontal(to, "red")
+        |> get_score_vertical(to, "green")
+        |> get_score_horizontal(to, "green")
+        |> get_score_vertical(to, "blue")
+        |> get_score_horizontal(to, "blue")
     end
   end
 
@@ -67,16 +72,57 @@ defmodule Line98.Game do
     |> Ball.build("dot", 3)
   end
 
-  def get_score(%Game{balls: balls, score: score} = board, {x, y} = to) do
-    check_balls =
-      balls
-      |> Ball.get_by_vertical(x)
-      |> IO.inspect(label: "get_by_vertical")
+  def get_score_vertical(%Game{balls: balls, score: score} = board, {x, y} = to, color) do
+    color_balls = Ball.group_by_color_vertical(balls, x)[color]
 
-    ids = for {{^x, y}, {_, "ball"}} <- check_balls, do: y
+    winner_balls =
+      case color_balls do
+        nil ->
+          nil
 
-    ids |> IO.inspect(label: "ids")
+        _ ->
+          color_balls
+          |> Ball.vertical_ids(x)
+          |> IO.inspect(label: "vertical_ids")
+          |> Game.sequence()
+          |> IO.inspect(label: "sequence")
+          |> Enum.filter(fn n -> length(n) >= 5 end)
+          |> IO.inspect(label: "filter 5")
+          |> List.first()
+      end
 
+    case winner_balls do
+      nil -> board
+      _ -> update_score_x(board, winner_balls, x)
+    end
+  end
+
+  def get_score_horizontal(%Game{balls: balls, score: score} = board, {x, y} = to, color) do
+    color_balls = Ball.group_by_color_horizontal(balls, y)[color]
+
+    winner_balls =
+      case color_balls do
+        nil ->
+          nil
+
+        _ ->
+          color_balls
+          |> Ball.horizontal_ids(y)
+          |> IO.inspect(label: "horizontal_ids")
+          |> Game.sequence()
+          |> IO.inspect(label: "sequence")
+          |> Enum.filter(fn n -> length(n) >= 5 end)
+          |> IO.inspect(label: "filter 5")
+          |> List.first()
+      end
+
+    case winner_balls do
+      nil -> board
+      _ -> update_score_y(board, winner_balls, y)
+    end
+  end
+
+  def sequence(ids) do
     ids
     |> Enum.reverse()
     |> Enum.reduce([], fn
@@ -84,20 +130,23 @@ defmodule Line98.Game do
       id, acc -> [[id] | acc]
     end)
     |> IO.inspect(charlists: :as_integers, label: "sequence")
-
-    board
   end
 
-  def update_score(%Game{balls: balls, score: score} = board, check_balls, color) do
-    cond do
-      check_balls[color] == nil ->
-        board
+  def update_score_x(%Game{balls: balls, score: score} = board, ids, line) do
+    balls =
+      Enum.reduce(ids, balls, fn id, acc ->
+        Map.delete(acc, {line, id})
+      end)
 
-      length(check_balls[color]) >= 5 ->
-        %Game{board | balls: balls, score: score + 10}
+    %Game{board | balls: balls, score: length(ids) * 10 + score}
+  end
 
-      true ->
-        board
-    end
+  def update_score_y(%Game{balls: balls, score: score} = board, ids, line) do
+    balls =
+      Enum.reduce(ids, balls, fn id, acc ->
+        Map.delete(acc, {id, line})
+      end)
+
+    %Game{board | balls: balls, score: length(ids) * 10 + score}
   end
 end
