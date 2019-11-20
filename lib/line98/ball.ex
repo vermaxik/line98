@@ -4,16 +4,29 @@ defmodule Line98.Ball do
   def colors, do: @colors
 
   def build(balls \\ %{}, type, times) do
-    new_balls = for n <- random_cells(balls, times), into: %{}, do: {n, {random_color(), type}}
+    new_balls =
+      for n <- random_coordinates([], times, balls), into: %{}, do: {n, {random_color(), type}}
+
     new_balls |> Map.merge(balls)
   end
 
-  defp random_cells(balls, times) do
-    1..times
-    |> Enum.reduce([], fn _, acc ->
-      # add avoid cells
-      List.insert_at(acc, 0, {:rand.uniform(10), :rand.uniform(10)})
-    end)
+  def random_coordinates(coordinates \\ [], times, balls) do
+    cond do
+      length(coordinates) == times ->
+        coordinates
+
+      true ->
+        coordinate = {:rand.uniform(10), :rand.uniform(10)}
+
+        case Enum.member?(Map.keys(balls), coordinate) do
+          true ->
+            random_coordinates(coordinates, times, balls)
+
+          _ ->
+            List.insert_at(coordinates, 0, coordinate)
+            |> random_coordinates(times, balls)
+        end
+    end
   end
 
   def grow(balls) do

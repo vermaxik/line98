@@ -8,11 +8,14 @@ defmodule Line98.Game do
 
   def new do
     %__MODULE__{}
-    |> init_fill()
+    |> initiale_state()
   end
 
-  defp init_fill(board) do
-    balls = Ball.build("ball", 3) |> Ball.build("dot", 3)
+  defp initiale_state(board) do
+    balls =
+      Ball.build("ball", 5)
+      |> Ball.build("dot", 3)
+
     %Game{board | balls: balls}
   end
 
