@@ -30,15 +30,12 @@ defmodule Line98.Ball do
   end
 
   def grow(balls) do
-    balls
-    |> Map.keys()
-    |> Enum.reduce(%{}, fn id, acc ->
-      {color, type} = balls[id]
+    dot_balls = for {coordinate, {_, "dot"}} <- balls, do: coordinate
 
-      case type == "dot" do
-        true -> Map.put(acc, id, {color, "ball"})
-        _ -> Map.put(acc, id, {color, type})
-      end
+    dot_balls
+    |> Enum.reduce(balls, fn coordinate, acc ->
+      {color, _} = acc[coordinate]
+      Map.put(acc, coordinate, {color, "ball"})
     end)
   end
 
