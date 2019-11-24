@@ -15,7 +15,8 @@
         class="box <%= cell_class(@board, {x, y}) %>"
         phx-click="cell"
         phx-value-select-x="<%= x %>"
-        phx-value-select-y="<%= y %>"></div>
+        phx-value-select-y="<%= y %>"
+        onclick="javascript:void();"></div>
     <% end %>
   <% end %>
 </div>
