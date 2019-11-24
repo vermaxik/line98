@@ -12,6 +12,11 @@ defmodule Line98Web.PlayLive do
     {:ok, assign(socket, board: board, selected_cell: nil)}
   end
 
+  def handle_event("again", _, socket) do
+    board = Game.new()
+    {:noreply, assign(socket, board: board, selected_cell: nil)}
+  end
+
   def handle_event("cell", %{"select-x" => x, "select-y" => y}, %{assigns: assigns} = socket) do
     coordinates = {String.to_integer(x), String.to_integer(y)}
 

@@ -15,6 +15,6 @@ defmodule Line98Web.PlayView do
 
   def selected_class(board, coordinate) do
     %{selected_field: selected, balls: balls} = board
-    if Map.has_key?(balls, coordinate) && selected == coordinate, do: " selected", else: ""
+    if Map.has_key?(balls, coordinate) && selected == coordinate, do: " selected ", else: ""
   end
 end

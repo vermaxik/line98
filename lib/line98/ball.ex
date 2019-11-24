@@ -62,11 +62,13 @@ defmodule Line98.Ball do
   end
 
   def vertical_ids(balls, line) do
-    for {{^line, y}, {_, "ball"}} <- balls, do: y
+    ids = for {{^line, y}, {_, "ball"}} <- balls, do: y
+    Enum.sort(ids)
   end
 
   def horizontal_ids(balls, line) do
-    for {{x, ^line}, {_, "ball"}} <- balls, do: x
+    ids = for {{x, ^line}, {_, "ball"}} <- balls, do: x
+    Enum.sort(ids)
   end
 
   def group_by_color(balls) do

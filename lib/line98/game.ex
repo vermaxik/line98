@@ -13,10 +13,14 @@ defmodule Line98.Game do
 
   defp initiale_state(board) do
     balls =
-      Ball.build("ball", 5)
-      |> Ball.build("dot", 3)
+      Ball.build("ball", 20)
+      |> Ball.build("dot", 10)
 
     %Game{board | balls: balls}
+  end
+
+  def over?(board) do
+    map_size(board.balls) >= 100
   end
 
   def select(board, coordinate) do
@@ -72,7 +76,7 @@ defmodule Line98.Game do
     Map.delete(balls, selected_field)
     |> Map.put(to, selected_ball)
     |> Ball.grow()
-    |> Ball.build("dot", 3)
+    |> Ball.build("dot", 10)
   end
 
   def get_score_vertical(%Game{balls: balls, score: score} = board, {x, y} = to, color) do
@@ -141,7 +145,7 @@ defmodule Line98.Game do
         Map.delete(acc, {line, id})
       end)
 
-    %Game{board | balls: balls, score: length(ids) * 10 + score}
+    %Game{board | balls: balls, score: length(ids) * 2 + score}
   end
 
   def update_score_y(%Game{balls: balls, score: score} = board, ids, line) do
@@ -150,6 +154,6 @@ defmodule Line98.Game do
         Map.delete(acc, {id, line})
       end)
 
-    %Game{board | balls: balls, score: length(ids) * 10 + score}
+    %Game{board | balls: balls, score: length(ids) * 2 + score}
   end
 end

@@ -1,6 +1,14 @@
 <h3>Score: <%= @board.score %></h3>
 
 <div class="wrapper">
+  <%= if Line98.Game.over?(@board) do %>
+    <div class="gameover">
+      <h1>Game Over</h1>
+      <h3>Your score: <%= @board.score %></h3>
+      <button phx-click="again">Again?</button>
+    </div>
+    <div class="overlay"></div>
+  <% end %>
   <%= for y <- 1..10 do %>
     <%= for x <- 1..10 do %>
       <div

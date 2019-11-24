@@ -68,9 +68,27 @@
   animation-iteration-count: infinite;
 }
 
+
 .wrapper {
-  width: 400px;
+  width: 550px;
   display: grid;
   grid-template-columns: 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px ;
   grid-gap: 5px;
+  position: relative;
+}
+
+.gameover {
+  position: absolute;
+  top: 200px;
+  left: 190px;
+  z-index: 2;
+  text-align: center;
+}
+.overlay {
+  position: absolute;
+  background-color: #fff;
+  opacity: 0.6;
+  width: 100%;
+  z-index: 1;
+  height: 100%;
 }
