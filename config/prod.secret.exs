@@ -9,10 +9,9 @@ config :line98, Line98.Repo,
   url: "${DATABASE_URL}",
   pool_size: 2
 
-
 config :line98, Line98Web.Endpoint,
   http: [:inet6, port: String.to_integer(System.get_env("PORT") || "4000")],
-  secret_key_base: "${SECRET_KEY_BASE}",
+  secret_key_base: "${SECRET_KEY_BASE}"
 
 # ## Using releases (Elixir v1.9+)
 #
