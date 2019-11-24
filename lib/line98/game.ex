@@ -13,8 +13,8 @@ defmodule Line98.Game do
 
   defp initiale_state(board) do
     balls =
-      Ball.build("ball", 20)
-      |> Ball.build("dot", 10)
+      Ball.build("ball", 5)
+      |> Ball.build("dot", 3)
 
     %Game{board | balls: balls}
   end
@@ -76,7 +76,7 @@ defmodule Line98.Game do
     Map.delete(balls, selected_field)
     |> Map.put(to, selected_ball)
     |> Ball.grow()
-    |> Ball.build("dot", 10)
+    |> Ball.build("dot", 3)
   end
 
   def get_score_vertical(%Game{balls: balls, score: score} = board, {x, y} = to, color) do
