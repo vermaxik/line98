@@ -61,10 +61,20 @@ defmodule Line98.Ball do
     |> IO.inspect(label: "group_by_color_horizontal")
   end
 
+  def vertical_ids(nil, _line), do: []
+
   def vertical_ids(balls, line) do
     ids = for {{^line, y}, {_, "ball"}} <- balls, do: y
     Enum.sort(ids)
   end
+
+  def horizontal_ids_new(balls) do
+    for line <- 1..10, into: %{} do
+      {line, for({{x, ^line}, {_, "ball"}} <- balls, do: x)}
+    end
+  end
+
+  def horizontal_ids(nil, _line), do: []
 
   def horizontal_ids(balls, line) do
     ids = for {{x, ^line}, {_, "ball"}} <- balls, do: x
