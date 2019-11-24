@@ -4,7 +4,7 @@ defmodule Line98.Game do
   alias Line98.Board
   alias Line98.Board.Solver
 
-  defstruct balls: %{}, selected_field: nil, score: 0
+  defstruct balls: %{}, selected_field: nil, score: 0, path: []
 
   def new do
     %__MODULE__{}
@@ -13,8 +13,8 @@ defmodule Line98.Game do
 
   defp initiale_state(board) do
     balls =
-      Ball.build("ball", 20)
-      |> Ball.build("dot", 10)
+      Ball.build("ball", 5)
+      |> Ball.build("dot", 3)
 
     %Game{board | balls: balls}
   end
@@ -56,10 +56,13 @@ defmodule Line98.Game do
       is_atom(solution) && solution == :none ->
         %Game{board | selected_field: nil}
 
+#      is_list(solution) && length(solution) > 0 ->
+#        %Game{board | path: solution}
+
       true ->
         new_balls = grow_and_generate_balls(board, to)
 
-        %Game{board | selected_field: nil, balls: new_balls}
+        %Game{board | selected_field: nil, balls: new_balls, path: solution}
         |> IO.inspect(label: "Game#board")
         |> get_score_vertical(to, "red")
         |> get_score_horizontal(to, "red")
@@ -76,10 +79,10 @@ defmodule Line98.Game do
     Map.delete(balls, selected_field)
     |> Map.put(to, selected_ball)
     |> Ball.grow()
-    |> Ball.build("dot", 10)
+    |> Ball.build("dot", 3)
   end
 
-  def get_score_vertical(%Game{balls: balls, score: score} = board, {x, y} = to, color) do
+  def get_score_vertical(%Game{balls: balls, score: score} = board, {x, y}, color) do
     color_balls = Ball.group_by_color_vertical(balls, x)[color]
 
     winner_balls =
@@ -104,7 +107,7 @@ defmodule Line98.Game do
     end
   end
 
-  def get_score_horizontal(%Game{balls: balls, score: score} = board, {x, y} = to, color) do
+  def get_score_horizontal(%Game{balls: balls, score: score} = board, {x, y}, color) do
     color_balls = Ball.group_by_color_horizontal(balls, y)[color]
 
     winner_balls =
