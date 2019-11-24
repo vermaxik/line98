@@ -1,38 +1,34 @@
 defmodule Line98.Game do
   alias __MODULE__
+  alias Line98.Ball
+  alias Line98.Board
+  alias Line98.Board.Solver
 
   defstruct balls: %{}, selected_field: nil, score: 0
 
-  @ballColors ["red", "green", "blue"]
-
   def new do
     %__MODULE__{}
-    |> init_fill()
+    |> initiale_state()
   end
 
-  defp init_fill(board) do
-    %Game{board | balls: build_balls("ball", 3) |> build_balls("dot", 3)}
+  defp initiale_state(board) do
+    balls =
+      Ball.build("ball", 20)
+      |> Ball.build("dot", 10)
+
+    %Game{board | balls: balls}
   end
 
-  defp build_balls(balls \\ %{}, type, times) do
-    random_cells =
-      1..100
-      |> Enum.reject(fn n -> avoid_cells(balls, n) end)
-      |> Enum.shuffle()
-      |> Enum.take(times)
-
-    new_balls = for n <- random_cells, into: %{}, do: {n, {random_color(), type}}
-    new_balls |> Map.merge(balls)
-
-    # balls = random_cells |> Enum.reduce(%{}, fn n, acc ->
-    #   Map.put(acc, n, {random_color(), type})
-    # end) |> Map.merge(board)
+  def over?(board) do
+    map_size(board.balls) >= 100
   end
 
-  def select_field(board, field_index) do
-    case board.balls[field_index] do
+  def select(board, coordinate) do
+    IO.inspect(coordinate)
+
+    case board.balls[coordinate] do
       {_, "ball"} ->
-        %Game{board | selected_field: field_index}
+        %Game{board | selected_field: coordinate}
 
       _ ->
         board
@@ -45,44 +41,119 @@ defmodule Line98.Game do
     do: board
 
   def move(%Game{balls: balls, selected_field: selected_field} = board, to) do
+    solution =
+      %Board{
+        start_point: selected_field,
+        exit_point: to,
+        walls: Ball.walls(balls, selected_field)
+      }
+      |> Solver.shortest_route()
+
     cond do
-      avoid_cells(balls, to) ->
+      Ball.avoid_cells(balls, to) ->
         board
 
-      true ->
-        selected_ball = balls[selected_field]
+      is_atom(solution) && solution == :none ->
+        %Game{board | selected_field: nil}
 
-        new_balls =
-          Map.delete(balls, selected_field)
-          |> Map.put(to, selected_ball)
-          |> grow_balls()
-          |> build_balls("dot", 3)
+      true ->
+        new_balls = grow_and_generate_balls(board, to)
 
         %Game{board | selected_field: nil, balls: new_balls}
+        |> IO.inspect(label: "Game#board")
+        |> get_score_vertical(to, "red")
+        |> get_score_horizontal(to, "red")
+        |> get_score_vertical(to, "green")
+        |> get_score_horizontal(to, "green")
+        |> get_score_vertical(to, "blue")
+        |> get_score_horizontal(to, "blue")
     end
   end
 
-  def grow_balls(balls) do
-    balls
-    |> Map.keys()
-    |> Enum.reduce(%{}, fn id, acc ->
-      {color, type} = balls[id]
+  def grow_and_generate_balls(%Game{balls: balls, selected_field: selected_field} = board, to) do
+    selected_ball = balls[selected_field]
 
-      cond do
-        type == "dot" ->
-          Map.put(acc, id, {color, "ball"})
+    Map.delete(balls, selected_field)
+    |> Map.put(to, selected_ball)
+    |> Ball.grow()
+    |> Ball.build("dot", 10)
+  end
 
-        true ->
-          Map.put(acc, id, {color, type})
+  def get_score_vertical(%Game{balls: balls, score: score} = board, {x, y} = to, color) do
+    color_balls = Ball.group_by_color_vertical(balls, x)[color]
+
+    winner_balls =
+      case color_balls do
+        nil ->
+          nil
+
+        _ ->
+          color_balls
+          |> Ball.vertical_ids(x)
+          |> IO.inspect(label: "vertical_ids")
+          |> Game.sequence()
+          |> IO.inspect(label: "sequence")
+          |> Enum.filter(fn n -> length(n) >= 5 end)
+          |> IO.inspect(label: "filter 5")
+          |> List.first()
       end
+
+    case winner_balls do
+      nil -> board
+      _ -> update_score_x(board, winner_balls, x)
+    end
+  end
+
+  def get_score_horizontal(%Game{balls: balls, score: score} = board, {x, y} = to, color) do
+    color_balls = Ball.group_by_color_horizontal(balls, y)[color]
+
+    winner_balls =
+      case color_balls do
+        nil ->
+          nil
+
+        _ ->
+          color_balls
+          |> Ball.horizontal_ids(y)
+          |> IO.inspect(label: "horizontal_ids")
+          |> Game.sequence()
+          |> IO.inspect(label: "sequence")
+          |> Enum.filter(fn n -> length(n) >= 5 end)
+          |> IO.inspect(label: "filter 5")
+          |> List.first()
+      end
+
+    case winner_balls do
+      nil -> board
+      _ -> update_score_y(board, winner_balls, y)
+    end
+  end
+
+  def sequence(ids) do
+    ids
+    |> Enum.reverse()
+    |> Enum.reduce([], fn
+      id, [head = [h | _] | tail] when id == h - 1 -> [[id | head] | tail]
+      id, acc -> [[id] | acc]
     end)
+    |> IO.inspect(charlists: :as_integers, label: "sequence")
   end
 
-  defp random_color() do
-    @ballColors |> Enum.shuffle() |> List.first()
+  def update_score_x(%Game{balls: balls, score: score} = board, ids, line) do
+    balls =
+      Enum.reduce(ids, balls, fn id, acc ->
+        Map.delete(acc, {line, id})
+      end)
+
+    %Game{board | balls: balls, score: length(ids) * 2 + score}
   end
 
-  defp avoid_cells(balls, field_index) do
-    balls |> Map.keys() |> Enum.member?(field_index)
+  def update_score_y(%Game{balls: balls, score: score} = board, ids, line) do
+    balls =
+      Enum.reduce(ids, balls, fn id, acc ->
+        Map.delete(acc, {id, line})
+      end)
+
+    %Game{board | balls: balls, score: length(ids) * 2 + score}
   end
 end

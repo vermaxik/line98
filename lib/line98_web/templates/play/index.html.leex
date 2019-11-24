@@ -1,8 +1,21 @@
+<h3>Score: <%= @board.score %></h3>
+
 <div class="wrapper">
-  <%= for index <- 1..100 do %>
-    <div
-      class="box <%= cell_class(@board, index) %>"
-      phx-click="range"
-      phx-value-select="<%= index %>"></div>
+  <%= if Line98.Game.over?(@board) do %>
+    <div class="gameover">
+      <h1>Game Over</h1>
+      <h3>Your score: <%= @board.score %></h3>
+      <button phx-click="again">Again?</button>
+    </div>
+    <div class="overlay"></div>
+  <% end %>
+  <%= for y <- 1..10 do %>
+    <%= for x <- 1..10 do %>
+      <div
+        class="box <%= cell_class(@board, {x, y}) %>"
+        phx-click="cell"
+        phx-value-select-x="<%= x %>"
+        phx-value-select-y="<%= y %>"></div>
+    <% end %>
   <% end %>
 </div>
