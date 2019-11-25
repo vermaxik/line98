@@ -5,7 +5,9 @@ defmodule Line98.Ball do
 
   def build(balls \\ %{}, type, times) do
     new_balls =
-      for n <- random_coordinates([], times, balls), into: %{}, do: {n, {random_color(), type}}
+      for n <- random_coordinates([], times, balls),
+          into: %{},
+          do: {n, {random_color(balls), type}}
 
     new_balls |> Map.merge(balls)
   end
@@ -100,9 +102,28 @@ defmodule Line98.Ball do
     |> Enum.member?(coordinate)
   end
 
-  defp random_color() do
-    colors()
+  defp random_color(balls \\ %{}) do
+    cond do
+      map_size(balls) > 9 ->
+        colors()
+        |> Enum.reject(&(&1 == detect_popular_color(balls)))
+
+      true ->
+        colors()
+    end
     |> Enum.shuffle()
     |> List.first()
+  end
+
+  defp detect_popular_color(balls) do
+    popular_color =
+      balls
+      |> group_by_color()
+      |> Enum.to_list()
+      |> Enum.sort(fn {_, v1}, {_, v2} -> length(v1) > length(v2) end)
+      |> List.first()
+
+    {color, _} = popular_color
+    color
   end
 end

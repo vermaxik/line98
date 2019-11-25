@@ -10,10 +10,10 @@ defmodule Line98.Game do
 
   def new do
     %__MODULE__{}
-    |> initiale_state()
+    |> initial_state()
   end
 
-  defp initiale_state(board) do
+  defp initial_state(board) do
     balls =
       Ball.build("ball", 5)
       |> Ball.build("dot", 3)
