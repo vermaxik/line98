@@ -12,7 +12,7 @@
   <%= for y <- 1..10 do %>
     <%= for x <- 1..10 do %>
       <div
-        class="box <%= cell_class(@board, {x, y}) %>"
+        class="box <%= cell_class(@board, {x, y}) %> <%= move_class(@board, {x, y}) %>"
         phx-click="cell"
         phx-value-select-x="<%= x %>"
         phx-value-select-y="<%= y %>"></div>

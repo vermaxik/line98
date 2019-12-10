@@ -56,9 +56,6 @@ defmodule Line98.Game do
       is_atom(solution) && solution == :none ->
         %Game{board | selected_field: nil}
 
-#      is_list(solution) && length(solution) > 0 ->
-#        %Game{board | path: solution}
-
       true ->
         new_balls = grow_and_generate_balls(board, to)
 
