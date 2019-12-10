@@ -17,4 +17,13 @@ defmodule Line98Web.PlayView do
     %{selected_field: selected, balls: balls} = board
     if Map.has_key?(balls, coordinate) && selected == coordinate, do: " selected ", else: ""
   end
+
+  def move_class(board, coordinate) do
+    head = List.first(board.path)
+    cond do
+      head == nil -> ""
+      coordinate == head -> " move"
+      true -> ""
+    end
+  end
 end

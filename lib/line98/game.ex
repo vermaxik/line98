@@ -6,7 +6,7 @@ defmodule Line98.Game do
 
   @destroy_balls 5
 
-  defstruct balls: %{}, selected_field: nil, score: 0
+  defstruct balls: %{}, selected_field: nil, score: 0, path: []
 
   def new do
     %__MODULE__{}
@@ -61,7 +61,7 @@ defmodule Line98.Game do
       true ->
         new_balls = grow_and_generate_balls(board, to)
 
-        %Game{board | selected_field: nil, balls: new_balls}
+        %Game{board | selected_field: nil, balls: new_balls, path: solution}
         |> IO.inspect(label: "Game#board")
         |> calculate_scores(to)
     end
@@ -96,6 +96,7 @@ defmodule Line98.Game do
     |> List.first()
     |> update_score_x(board, x)
   end
+
 
   def get_score_horizontal(%Game{balls: balls} = board, {x, y} = to, color) do
     color_balls = Ball.group_by_color_horizontal(balls, y)[color]
