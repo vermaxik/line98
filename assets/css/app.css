@@ -20,14 +20,17 @@
 
 .ball-red {
   background: radial-gradient(circle at 50px 50px, #500, #a00);
+  cursor: pointer;
 }
 
 .ball-green {
   background: radial-gradient(circle at 50px 50px, #050, #0a0);
+  cursor: pointer;
 }
 
 .ball-blue {
   background: radial-gradient(circle at 50px 50px, #005, #00a);
+  cursor: pointer;
 }
 
 .dot-red::after {
