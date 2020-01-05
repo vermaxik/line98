@@ -20,10 +20,11 @@ defmodule Line98Web.PlayView do
 
   def move_class(board, coordinate) do
     head = List.first(board.path)
-    cond do
-      head == nil -> ""
-      coordinate == head -> " move"
-      true -> ""
+    case board.path do
+      [^coordinate | _] -> " move"
+      nil -> ""
+      _ -> ""
     end
   end
+
 end
