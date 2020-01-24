@@ -1,11 +1,13 @@
 defmodule Line98Web.Endpoint do
   use Phoenix.Endpoint, otp_app: :line98
 
+  @session_options [ store: :cookie, key: "_line98_key", signing_salt: "29u4tlo0" ]
+
   socket "/socket", Line98Web.UserSocket,
     websocket: true,
     longpoll: false
 
-  socket "/live", Phoenix.LiveView.Socket
+  socket "/live", Phoenix.LiveView.Socket,  websocket: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #
@@ -39,10 +41,7 @@ defmodule Line98Web.Endpoint do
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
-  plug Plug.Session,
-    store: :cookie,
-    key: "_line98_key",
-    signing_salt: "29u4tlo0"
+  plug Plug.Session, @session_options
 
   plug Line98Web.Router
 end

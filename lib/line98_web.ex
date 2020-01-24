@@ -45,7 +45,7 @@ defmodule Line98Web do
       import Line98Web.Gettext
       alias Line98Web.Router.Helpers, as: Routes
 
-      import Phoenix.LiveView, only: [live_render: 2, live_render: 3, live_link: 1, live_link: 2]
+      import Phoenix.LiveView.Helpers
     end
   end
 
