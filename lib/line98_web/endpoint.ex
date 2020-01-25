@@ -1,13 +1,13 @@
 defmodule Line98Web.Endpoint do
   use Phoenix.Endpoint, otp_app: :line98
 
-  @session_options [ store: :cookie, key: "_line98_key", signing_salt: "29u4tlo0" ]
+  @session_options [store: :cookie, key: "_line98_key", signing_salt: "29u4tlo0"]
 
   socket "/socket", Line98Web.UserSocket,
     websocket: true,
     longpoll: false
 
-  socket "/live", Phoenix.LiveView.Socket,  websocket: [connect_info: [session: @session_options]]
+  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #

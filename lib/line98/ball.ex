@@ -1,7 +1,5 @@
 defmodule Line98.Ball do
-  @colors ["red", "green", "blue"]
-
-  def colors, do: @colors
+  def colors, do: ~w(red green blue)
 
   def build(balls \\ %{}, type, times) do
     new_balls =
@@ -10,6 +8,14 @@ defmodule Line98.Ball do
           do: {n, {random_color(balls), type}}
 
     new_balls |> Map.merge(balls)
+  end
+
+  def move_ball_to_cell(balls, coordinate, new_coodinate) do
+    ball_value = balls[coordinate]
+
+    balls
+    |> Map.delete(coordinate)
+    |> Map.put(new_coodinate, ball_value)
   end
 
   def random_coordinates(coordinates \\ [], times, balls) do
@@ -29,6 +35,12 @@ defmodule Line98.Ball do
             |> random_coordinates(times, balls)
         end
     end
+  end
+
+  def grow_and_generate_balls(balls) do
+    balls
+    |> grow()
+    |> build("dot", 3)
   end
 
   def grow(balls) do
@@ -53,14 +65,12 @@ defmodule Line98.Ball do
     balls
     |> get_by_vertical(line)
     |> group_by_color()
-    |> IO.inspect(label: "group_by_color_vertical")
   end
 
   def group_by_color_horizontal(balls, line) do
     balls
     |> get_by_horizontal(line)
     |> group_by_color()
-    |> IO.inspect(label: "group_by_color_horizontal")
   end
 
   def vertical_ids(nil, _line), do: []
@@ -85,7 +95,7 @@ defmodule Line98.Ball do
 
   def group_by_color(balls) do
     balls
-    |> Enum.group_by(fn {{x, y}, {color, type}} -> color end)
+    |> Enum.group_by(fn {{_x, _y}, {color, _type}} -> color end)
   end
 
   def walls(balls, selected_field) do
@@ -102,7 +112,7 @@ defmodule Line98.Ball do
     |> Enum.member?(coordinate)
   end
 
-  defp random_color(balls \\ %{}) do
+  defp random_color(balls) do
     cond do
       map_size(balls) > 9 ->
         colors()

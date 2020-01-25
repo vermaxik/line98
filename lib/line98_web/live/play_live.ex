@@ -2,6 +2,7 @@ defmodule Line98Web.PlayLive do
   use Phoenix.LiveView
   alias Line98Web.PlayView
   alias Line98.Game
+  alias Line98.Ball
 
   def render(assigns) do
     PlayView.render("index.html", assigns)
@@ -26,26 +27,33 @@ defmodule Line98Web.PlayLive do
     new_board =
       case board.selected_field do
         nil -> Game.select(board, coordinates)
-        _   -> Game.move(board, coordinates)
+        _ -> Game.move(board, coordinates)
       end
 
-    IO.inspect(board, label: "handle_event#board")
     {:noreply, assign(socket, board: new_board, selected_cell: coordinates)}
   end
 
   def handle_info(:update_path, socket) do
     board = socket.assigns.board
 
-    case board.path do
-      [] ->
-        {:noreply, assign(socket, board: board)}
-
-      _ ->
-        board.path |> IO.inspect(label: "path ololo")
+    cond do
+      length(board.path) > 1 ->
+        [current_coordinate, to_coodinate | _] = board.path
+        new_balls = Ball.move_ball_to_cell(board.balls, current_coordinate, to_coodinate)
         [_ | tail] = board.path
 
-        {:noreply, assign(socket, board: %Game{board | path: tail})}
+        {:noreply, assign(socket, board: %Game{board | balls: new_balls, path: tail})}
+
+      length(board.path) == 1 ->
+        new_balls = Ball.grow_and_generate_balls(board.balls)
+        new_board =
+          %Game{board | balls: new_balls, path: [], to: nil}
+          |> Game.calculate_scores()
+
+        {:noreply, assign(socket, board: new_board)}
+
+      true ->
+        {:noreply, assign(socket, board: board)}
     end
   end
-
 end

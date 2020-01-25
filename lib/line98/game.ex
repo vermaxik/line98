@@ -6,7 +6,7 @@ defmodule Line98.Game do
 
   @destroy_balls 5
 
-  defstruct balls: %{}, selected_field: nil, score: 0, path: []
+  defstruct balls: %{}, selected_field: nil, score: 0, path: [], to: nil
 
   def new do
     %__MODULE__{}
@@ -26,8 +26,6 @@ defmodule Line98.Game do
   end
 
   def select(board, coordinate) do
-    IO.inspect(coordinate)
-
     case board.balls[coordinate] do
       {_, "ball"} ->
         %Game{board | selected_field: coordinate}
@@ -59,57 +57,57 @@ defmodule Line98.Game do
         %Game{board | selected_field: nil}
 
       true ->
-        new_balls = grow_and_generate_balls(board, to)
+        new_balls = Ball.move_ball_to_cell(board.balls, selected_field, List.first(solution))
 
-        %Game{board | selected_field: nil, balls: new_balls, path: solution}
-        |> IO.inspect(label: "Game#board")
-        |> calculate_scores(to)
+        %Game{board | selected_field: nil, balls: new_balls, path: solution, to: to}
     end
   end
 
-  def calculate_scores(board, to) do
+  def calculate_scores(board) do
     board
-    |> get_score_vertical(to, "red")
-    |> get_score_horizontal(to, "red")
-    |> get_score_vertical(to, "green")
-    |> get_score_horizontal(to, "green")
-    |> get_score_vertical(to, "blue")
-    |> get_score_horizontal(to, "blue")
+    |> get_score_horizontal()
+    |> get_score_vertical()
   end
 
-  def grow_and_generate_balls(%Game{balls: balls, selected_field: selected_field} = board, to) do
-    selected_ball = balls[selected_field]
-
-    Map.delete(balls, selected_field)
-    |> Map.put(to, selected_ball)
-    |> Ball.grow()
-    |> Ball.build("dot", 3)
+  defp get_score_horizontal(board) do
+    Enum.reduce(1..10, board, fn row, acc ->
+      get_score_horizontal(acc, row, "red")
+      |> get_score_horizontal(row, "green")
+      |> get_score_horizontal(row, "blue")
+    end)
   end
 
-  def get_score_vertical(%Game{balls: balls} = board, {x, y} = to, color) do
-    color_balls = Ball.group_by_color_vertical(balls, x)[color]
+  defp get_score_vertical(board) do
+    Enum.reduce(1..10, board, fn col, acc ->
+      get_score_vertical(acc, col, "red")
+      |> get_score_vertical(col, "green")
+      |> get_score_vertical(col, "blue")
+    end)
+  end
+
+  defp get_score_vertical(%Game{balls: balls} = board, col, color) do
+    color_balls = Ball.group_by_color_vertical(balls, col)[color]
 
     color_balls
-    |> Ball.vertical_ids(x)
-    |> Game.sequence()
+    |> Ball.vertical_ids(col)
+    |> sequence()
     |> Enum.filter(fn n -> length(n) >= @destroy_balls end)
     |> List.first()
-    |> update_score_x(board, x)
+    |> update_score_x(board, col)
   end
 
-
-  def get_score_horizontal(%Game{balls: balls} = board, {x, y} = to, color) do
-    color_balls = Ball.group_by_color_horizontal(balls, y)[color]
+  defp get_score_horizontal(%Game{balls: balls} = board, row, color) do
+    color_balls = Ball.group_by_color_horizontal(balls, row)[color]
 
     color_balls
-    |> Ball.horizontal_ids(y)
-    |> Game.sequence()
+    |> Ball.horizontal_ids(row)
+    |> sequence()
     |> Enum.filter(fn n -> length(n) >= @destroy_balls end)
     |> List.first()
-    |> update_score_y(board, y)
+    |> update_score_y(board, row)
   end
 
-  def sequence(ids) do
+  defp sequence(ids) do
     ids
     |> Enum.reverse()
     |> Enum.reduce([], fn
@@ -119,9 +117,8 @@ defmodule Line98.Game do
     |> IO.inspect(charlists: :as_integers, label: "sequence")
   end
 
-  def update_score_x(nil, board, _line), do: board
-
-  def update_score_x(ids, %Game{balls: balls, score: score} = board, line) do
+  defp update_score_x(nil, board, _line), do: board
+  defp update_score_x(ids, %Game{balls: balls, score: score} = board, line) do
     balls =
       Enum.reduce(ids, balls, fn id, acc ->
         Map.delete(acc, {line, id})
@@ -130,9 +127,8 @@ defmodule Line98.Game do
     %Game{board | balls: balls, score: length(ids) * 2 + score}
   end
 
-  def update_score_y(nil, board, _line), do: board
-
-  def update_score_y(ids, %Game{balls: balls, score: score} = board, line) do
+  defp update_score_y(nil, board, _line), do: board
+  defp update_score_y(ids, %Game{balls: balls, score: score} = board, line) do
     balls =
       Enum.reduce(ids, balls, fn id, acc ->
         Map.delete(acc, {id, line})
