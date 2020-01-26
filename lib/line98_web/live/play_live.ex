@@ -9,7 +9,8 @@ defmodule Line98Web.PlayLive do
   end
 
   def mount(_session, socket) do
-    if connected?(socket), do: :timer.send_interval(100, self(), :update_path)
+    if connected?(socket), do: :timer.send_interval(100, self(), :path_update)
+    if connected?(socket), do: :timer.send_interval(3000, self(), :score_update)
 
     board = Game.new()
     {:ok, assign(socket, board: board, selected_cell: nil)}
@@ -33,7 +34,7 @@ defmodule Line98Web.PlayLive do
     {:noreply, assign(socket, board: new_board, selected_cell: coordinates)}
   end
 
-  def handle_info(:update_path, socket) do
+  def handle_info(:path_update, socket) do
     board = socket.assigns.board
 
     cond do
@@ -55,5 +56,10 @@ defmodule Line98Web.PlayLive do
       true ->
         {:noreply, assign(socket, board: board)}
     end
+  end
+
+  def handle_info(:score_update, socket) do
+    board = socket.assigns.board
+    {:noreply, assign(socket, board: %Game{board | score_updated: false})}
   end
 end

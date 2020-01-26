@@ -4,9 +4,11 @@ defmodule Line98.Game do
   alias Line98.Board
   alias Line98.Board.Solver
 
+  @init_ball_count 5
+  @init_dot_count 3
   @destroy_balls 5
 
-  defstruct balls: %{}, selected_field: nil, score: 0, path: [], to: nil
+  defstruct balls: %{}, selected_field: nil, score: 0, score_updated: false, path: [], to: nil
 
   def new do
     %__MODULE__{}
@@ -15,8 +17,8 @@ defmodule Line98.Game do
 
   defp initial_state(board) do
     balls =
-      Ball.build("ball", 5)
-      |> Ball.build("dot", 3)
+      Ball.build("ball", @init_ball_count)
+      |> Ball.build("dot", @init_dot_count)
 
     %Game{board | balls: balls}
   end
@@ -124,7 +126,7 @@ defmodule Line98.Game do
         Map.delete(acc, {line, id})
       end)
 
-    %Game{board | balls: balls, score: length(ids) * 2 + score}
+    %Game{board | balls: balls, score: length(ids) * 2 + score, score_updated: true}
   end
 
   defp update_score_y(nil, board, _line), do: board
@@ -134,6 +136,6 @@ defmodule Line98.Game do
         Map.delete(acc, {id, line})
       end)
 
-    %Game{board | balls: balls, score: length(ids) * 2 + score}
+    %Game{board | balls: balls, score: length(ids) * 2 + score, score_updated: true}
   end
 end

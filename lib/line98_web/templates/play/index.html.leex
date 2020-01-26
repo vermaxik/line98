@@ -1,4 +1,9 @@
-<h3>Score: <%= @board.score %></h3>
+<h3>
+  Score:
+  <span class="score <%= if @board.score_updated, do: "score--updated" %>">
+    <%= @board.score %>
+  </span>
+</h3>
 
 <div class="wrapper">
   <%= if Line98.Game.over?(@board) do %>
