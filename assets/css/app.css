@@ -3,15 +3,60 @@
 @import "./phoenix.css";
 @import "../../deps/phoenix_live_view/assets/css/live_view.css";
 
+.header {
+  width: 100%;
+}
+
 .logo {
+  width: 20%;
   font-size: 32px;
-  margin-right: 30px;
+  margin-top: 10px;
+  text-align: center;
   float: left;
+  font-family: Georgia, serif;
+  letter-spacing: 1px;
+  word-spacing: 1px;
+  color: #c11;
+  font-weight: normal;
+  text-decoration: none solid rgb(68, 68, 68);
+  font-style: normal;
+  font-variant: normal;
+  text-transform: uppercase;
+}
+
+.logo span {
+  color: #191;
+}
+
+.logo i {
+  color: #119;
+  font-style: normal;
 }
 
 .rule {
-  text-align: right;
-  padding-right: 10px;
+  font-size: 12px;
+  color: #291616;
+  position: relative;
+  background: #e8e6ab;
+  border-radius: .4em;
+  margin-left: 20%;
+  margin-right: 20px;
+  padding: 10px 20px 10px 10px;
+}
+
+.rule:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 30%;
+  width: 0;
+  height: 0;
+  border: 25px solid transparent;
+  border-top-color: #e8e6ab;
+  border-bottom: 0;
+  border-left: 0;
+  margin-left: -12.5px;
+  margin-bottom: -25px;
 }
 
 .wrapper {
@@ -108,13 +153,14 @@
   }
 
   .logo {
-    margin-right: 10px;
+    width: 100%;
     float: none;
   }
 
   .rule {
-    padding-right: 5px;
-    text-align: justify;
+    width: 100%;
+    margin: 0;
+    padding: 5px 5px;
   }
 
   .leaderboard {
