@@ -24,7 +24,7 @@ defmodule Line98.Game do
   end
 
   def over?(board) do
-    map_size(board.balls) >= 100
+    map_size(board.balls) >= 20
   end
 
   def select(board, coordinate) do

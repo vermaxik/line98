@@ -1,28 +1,59 @@
-<h3>
-  Score:
-  <span class="score <%= if @board.score_updated, do: "score--updated" %>">
-    <%= @board.score %>
-  </span>
-</h3>
+<div class="container">
+  <div class="game">
+    <h3>
+      Score:
+      <span class="score <%= if @board.score_updated, do: "score--updated" %>">
+        <%= @board.score %>
+      </span>
+    </h3>
 
-<div class="wrapper">
-  <%= if Line98.Game.over?(@board) do %>
-    <div class="gameover">
-      <h1>Game Over</h1>
-      <h3>Your score: <%= @board.score %></h3>
-      <button phx-click="again">Again?</button>
+    <div class="wrapper">
+      <%= if Line98.Game.over?(@board) do %>
+        <div class="gameover">
+          <h1>Game Over</h1>
+          <h3>Your score: <b><%= @board.score %></b></h3>
+
+          <div class="form-add-result">
+            <%= if @hide_form_result do %>
+              <p>Great! You've added your result to the leaderboard!</p>
+              <a href="http://twitter.com/share?text=I got <%=@board.score%> scores in Line98 game! Do you wanna try with your result?&url=https://ballgames.gigalixirapp.com/&hashtags=line98,phoenixliveview,liveview" target="_blank" class="twitter">
+                Share with friends!
+              </a>
+            <% else %>
+              <form action="javascript:void(0);" phx-submit="add_result">
+                <p>Would you like to add your result to leaderboard?</p>
+                <input type="text" name="nickname" required="true" placeholder="your nickname ...">
+                <button>Add</button>
+              </form>
+            <% end %>
+
+          </div>
+          <button phx-click="again">Play Again?!</button>
+        </div>
+        <div class="overlay"></div>
+      <% end %>
+
+      <%= for y <- 1..10 do %>
+        <%= for x <- 1..10 do %>
+          <div
+            class="box <%= cell_class(@board, {x, y}) %>"
+            phx-click="cell"
+            phx-value-select-x="<%= x %>"
+            phx-value-select-y="<%= y %>"
+            onclick=""></div>
+        <% end %>
+      <% end %>
     </div>
-    <div class="overlay"></div>
-  <% end %>
+  </div>
 
-  <%= for y <- 1..10 do %>
-    <%= for x <- 1..10 do %>
-      <div
-        class="box <%= cell_class(@board, {x, y}) %> <%= move_class(@board, {x, y}) %>"
-        phx-click="cell"
-        phx-value-select-x="<%= x %>"
-        phx-value-select-y="<%= y %>"
-        onclick=""></div>
-    <% end %>
-  <% end %>
+  <div class="leaderboard">
+    <h3>Leaderboard:</h3>
+    <ul>
+      <%= for result <- @results do %>
+        <li title="<%= result.date %>">
+          <%= result.nickname %> &mdash; <%= result.score %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
 </div>

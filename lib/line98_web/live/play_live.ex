@@ -3,22 +3,43 @@ defmodule Line98Web.PlayLive do
   alias Line98Web.PlayView
   alias Line98.Game
   alias Line98.Ball
+  alias Line98.Leaderboard.Result
 
   def render(assigns) do
     PlayView.render("index.html", assigns)
   end
 
-  def mount(_session, socket) do
+  def mount(_params, _session, socket) do
     if connected?(socket), do: :timer.send_interval(100, self(), :path_update)
     if connected?(socket), do: :timer.send_interval(3000, self(), :score_update)
 
     board = Game.new()
-    {:ok, assign(socket, board: board, selected_cell: nil)}
+    results = Line98.Leaderboard.Results.leaderboard()
+    {:ok, assign(socket, board: board, selected_cell: nil, results: results, hide_form_result: false)}
   end
 
   def handle_event("again", _, socket) do
     board = Game.new()
-    {:noreply, assign(socket, board: board, selected_cell: nil)}
+    {:noreply, assign(socket, board: board, selected_cell: nil, hide_form_result: false)}
+  end
+
+  def handle_event("add_result", %{"nickname" => nickname}, socket) do
+    params = %{nickname: nickname,
+              score: socket.assigns.board.score,
+              date:  DateTime.utc_now}
+
+    changeset = Result.changeset(%Result{}, params)
+
+    case changeset.valid? do
+      true ->
+        Line98.Repo.insert(changeset)
+        {:noreply,
+          assign(socket,
+                 results: Line98.Leaderboard.Results.leaderboard(),
+                 hide_form_result: true)}
+      false ->
+        handle_event("again", "", socket)
+    end
   end
 
   def handle_event("cell", %{"select-x" => x, "select-y" => y}, socket) do
