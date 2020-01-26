@@ -10,9 +10,16 @@
   </head>
   <body>
     <header>
-      <h1>Line 98</h1>
+      <div class="logo">
+        Line 98
+      </div>
+      <div class="rule">
+        <p><b>The Rule</b>: you should collect at least <b>5 balls</b> of the <b>same color</b> in one line (horizontal or vertical) to earn scores. <br>
+        Each step of the game generates 3 small balls, which turn into a normal ball one step further. <br>
+        The goal is to get as many scores as possible. When there is no free cell left, the game line98 is over and you can start a new one.</p>
+      </div>
     </header>
-    <main role="main" class="container">
+    <main role="main">
       <%= render @view_module, @view_template, assigns %>
     </main>
     <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
