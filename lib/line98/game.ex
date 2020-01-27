@@ -53,7 +53,7 @@ defmodule Line98.Game do
 
     cond do
       Ball.avoid_cells(balls, to) ->
-        board
+        %Game{board | selected_field: nil}
 
       is_atom(solution) && solution == :none ->
         %Game{board | selected_field: nil}
