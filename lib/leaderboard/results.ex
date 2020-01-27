@@ -7,7 +7,7 @@ defmodule Line98.Leaderboard.Results do
 
   def all(), do: Repo.all(Result)
 
-  def leaderboard(limit \\ 10) do
+  def leaderboard(limit \\ 15) do
   	Result
   	|> where([r], r.score > 0)
   	|> order_by([r], desc: r.score)

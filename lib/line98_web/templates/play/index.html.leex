@@ -48,7 +48,7 @@
 
   <div class="leaderboard">
     <h3>Leaderboard:</h3>
-    <ul>
+    <ol>
       <%= for result <- @results do %>
         <li title="<%= result.date %>">
           <%= result.nickname %> &mdash; <%= result.score %>
