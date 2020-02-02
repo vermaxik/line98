@@ -14,8 +14,14 @@ defmodule Line98Web.PlayLive do
     if connected?(socket), do: :timer.send_interval(3000, self(), :score_update)
 
     board = Game.new()
-    results = Line98.Leaderboard.Results.leaderboard()
-    {:ok, assign(socket, board: board, selected_cell: nil, results: results, hide_form_result: false)}
+    results = Line98.Leaderboard.Results.general()
+    today_results = Line98.Leaderboard.Results.today()
+    {:ok, assign(socket,
+                 board: board,
+                 selected_cell: nil,
+                 results: results,
+                 today_results: today_results,
+                 hide_form_result: false)}
   end
 
   def handle_event("again", _, socket) do
@@ -35,7 +41,8 @@ defmodule Line98Web.PlayLive do
         Line98.Repo.insert(changeset)
         {:noreply,
           assign(socket,
-                 results: Line98.Leaderboard.Results.leaderboard(),
+                 results: Line98.Leaderboard.Results.general(),
+                 today_results: Line98.Leaderboard.Results.today(),
                  hide_form_result: true)}
       false ->
         handle_event("again", "", socket)

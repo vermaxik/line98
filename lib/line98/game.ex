@@ -4,7 +4,7 @@ defmodule Line98.Game do
   alias Line98.Board
   alias Line98.Board.Solver
 
-  @init_ball_count 5
+  @init_ball_count 80
   @init_dot_count 3
   @destroy_balls 5
 

@@ -47,13 +47,24 @@
   </div>
 
   <div class="leaderboard">
-    <h3>Leaderboard:</h3>
+    <h3>Leaderboard</h3>
+    <%= if Enum.any?(@today_results) do %>
+      <b>Today:</b>
+      <ol>
+        <%= for result <- @today_results do %>
+          <li title="<%= result.date %>">
+            <%= result.nickname %> &mdash; <%= result.score %>
+          </li>
+        <% end %>
+      </ol>
+    <% end %>
+    <b>General:</b>
     <ol>
       <%= for result <- @results do %>
         <li title="<%= result.date %>">
           <%= result.nickname %> &mdash; <%= result.score %>
         </li>
       <% end %>
-    </ul>
+    </ol>
   </div>
 </div>
