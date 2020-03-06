@@ -9,8 +9,8 @@ defmodule Line98.Leaderboard.Result do
   end
 
   def changeset(result, params \\ %{}) do
-	  result
-	  |> cast(params, [:nickname, :score, :date])
-	  |> validate_required([:nickname, :score])
-	end
+    result
+    |> cast(params, [:nickname, :score, :date])
+    |> validate_required([:nickname, :score])
+  end
 end

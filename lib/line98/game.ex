@@ -120,6 +120,7 @@ defmodule Line98.Game do
   end
 
   defp update_score_x(nil, board, _line), do: board
+
   defp update_score_x(ids, %Game{balls: balls, score: score} = board, line) do
     balls =
       Enum.reduce(ids, balls, fn id, acc ->
@@ -130,6 +131,7 @@ defmodule Line98.Game do
   end
 
   defp update_score_y(nil, board, _line), do: board
+
   defp update_score_y(ids, %Game{balls: balls, score: score} = board, line) do
     balls =
       Enum.reduce(ids, balls, fn id, acc ->

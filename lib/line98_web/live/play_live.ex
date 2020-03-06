@@ -16,12 +16,15 @@ defmodule Line98Web.PlayLive do
     board = Game.new()
     results = Line98.Leaderboard.Results.general()
     today_results = Line98.Leaderboard.Results.today()
-    {:ok, assign(socket,
-                 board: board,
-                 selected_cell: nil,
-                 results: results,
-                 today_results: today_results,
-                 hide_form_result: false)}
+
+    {:ok,
+     assign(socket,
+       board: board,
+       selected_cell: nil,
+       results: results,
+       today_results: today_results,
+       hide_form_result: false
+     )}
   end
 
   def handle_event("again", _, socket) do
@@ -30,20 +33,21 @@ defmodule Line98Web.PlayLive do
   end
 
   def handle_event("add_result", %{"nickname" => nickname}, socket) do
-    params = %{nickname: nickname,
-              score: socket.assigns.board.score,
-              date:  DateTime.utc_now}
+    params = %{nickname: nickname, score: socket.assigns.board.score, date: DateTime.utc_now()}
 
     changeset = Result.changeset(%Result{}, params)
 
     case changeset.valid? do
       true ->
         Line98.Repo.insert(changeset)
+
         {:noreply,
-          assign(socket,
-                 results: Line98.Leaderboard.Results.general(),
-                 today_results: Line98.Leaderboard.Results.today(),
-                 hide_form_result: true)}
+         assign(socket,
+           results: Line98.Leaderboard.Results.general(),
+           today_results: Line98.Leaderboard.Results.today(),
+           hide_form_result: true
+         )}
+
       false ->
         handle_event("again", "", socket)
     end
@@ -75,6 +79,7 @@ defmodule Line98Web.PlayLive do
 
       length(board.path) == 1 ->
         new_balls = Ball.grow_and_generate_balls(board.balls)
+
         new_board =
           %Game{board | balls: new_balls, path: [], to: nil}
           |> Game.calculate_scores()
